@@ -1,0 +1,2 @@
+duration #rocks
+posx posy velx vely size n ang
