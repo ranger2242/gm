@@ -3,6 +3,7 @@ package com.quadx.asteroids.asteroids.powerups;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.quadx.asteroids.anims.RechargeAnim;
+import com.quadx.asteroids.asteroids.Asteroid;
 import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.shapes1_2.*;
 import com.quadx.asteroids.states.AsteroidState;
@@ -19,10 +20,13 @@ public class CBomb extends Powerup {
     public CBomb(){
         lim=300*ft;
         dtUse=new Delta(lim);
-        dtUse.finish();
-        index=2;
         dtDeath=new Delta(40*ft);
+        dtUse.finish();
+        dtDeath.finish();
+        index=2;
         loadTexture("cbomb");
+        name="CBOMB";
+        price=1250;
     }
     @Override
     public void use(Ship s) {
@@ -35,12 +39,17 @@ public class CBomb extends Powerup {
     @Override
     public void update(float dt) {
         Vector2 p= AsteroidState.player.getPos();
-        dtrechargeAnim.setCenter(p);
-        dtrechargeAnim.update(dt);
+
         dtDeath.update(dt);
         dtUse.update(dt);
         if (dtDeath.isDone()) {
             shape=new Circle(p,0);
+            dtrechargeAnim.setCenter(p);
+            dtrechargeAnim.update(dt);
+            Color c = new Color(1, .1f, 0, 1);
+            c.r = 1 - (1 * (dtrechargeAnim.getAngle() / 360));
+            c.g = (float) (1 * Math.exp(9 * (dtrechargeAnim.getAngle() / 360) - 9));
+            dtrechargeAnim.setColor(c);
         } else {
                 shape.center.set(p);
                 shape.radius+=300*dt;
@@ -56,7 +65,9 @@ public class CBomb extends Powerup {
     }
 
     @Override
-    public boolean collide(Ngon n) {
+    public boolean collide(Asteroid a) {
+        Ngon n= a.getShape();
+
         for(Triangle t: Triangle.triangulate(n)){
             if(shape.overlaps(t)){
                     return true;

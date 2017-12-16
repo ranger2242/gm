@@ -1,4 +1,4 @@
-package com.quadx.asteroids.tools;
+package com.quadx.asteroids.tools.hud;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +11,7 @@ import com.quadx.asteroids.asteroids.powerups.Bullet;
 import com.quadx.asteroids.asteroids.powerups.CBomb;
 import com.quadx.asteroids.asteroids.powerups.Laser;
 import com.quadx.asteroids.asteroids.powerups.Powerup;
+import com.quadx.asteroids.tools.*;
 
 import java.util.ArrayList;
 

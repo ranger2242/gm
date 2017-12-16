@@ -58,4 +58,8 @@ public class RechargeAnim extends Anim {
     public float getAngle() {
         return arc.getAngle();
     }
+
+    public void finish() {
+        dtPassed=Float.MAX_VALUE;
+    }
 }

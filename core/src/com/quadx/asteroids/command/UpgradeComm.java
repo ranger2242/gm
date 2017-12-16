@@ -4,6 +4,7 @@ import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.tools.Game;
 
+import static com.quadx.asteroids.states.AsteroidState.hud;
 import static com.quadx.asteroids.tools.Game.mode;
 
 /**
@@ -16,7 +17,7 @@ public class UpgradeComm extends Command {
     @Override
     public void execute() {
         if(cls.equals(AsteroidState.class)){
-            if(mode== Game.Mode.ANDROID&& Game.hud.getIncButton().isPressed() ){
+            if(mode== Game.Mode.ANDROID&& hud.getIncButton().isPressed() ){
                 Ship.upgradePower(AsteroidState.player);
             }
         }

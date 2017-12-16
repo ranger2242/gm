@@ -37,8 +37,9 @@ public class Ship {
     private int tempScore = 0;
     private int money = 0;
     private final ArrayList<Powerup> powerups = new ArrayList<>();
-    private Powerup powerup = new Bullet();
+    private Powerup powerup = new Freeze();
     private final Color color;
+    private boolean immune = false;
 
     public Ship() {
         this(Color.RED);
@@ -54,8 +55,14 @@ public class Ship {
         color = c;
         powerups.add(new Bullet());
         powerups.add(new Laser());
+        powerups.add(new Lightning());
+        powerups.add(new VRam());
+        powerups.add(new Warp());
+        powerups.add(new Freeze());
+        powerups.add(new Shield());
         powerups.add(new CBomb());
         powerups.add(new Mine());
+        powerup = powerups.get(0);
 
     }
 
@@ -66,17 +73,17 @@ public class Ship {
         if (host)
             sr.setColor(Color.GREEN);
 
-        if(isDead()){
+        if (isDead()) {
             sr.set(ShapeRenderer.ShapeType.Line);
             sr.setColor(Color.WHITE);
-            sr.circle(new Circle(new Vector2(WIDTH/2,HEIGHT/2),getR()*3));
+            sr.circle(new Circle(new Vector2(WIDTH / 2, HEIGHT / 2), getR() * 3));
         }
 
-    for(int i=0; i<lives;i++){
-            Triangle t = Triangle.updatePoints(pos,90,r);
-            sr.setColor(1,1,1,1);
+        for (int i = 0; i < lives; i++) {
+            Triangle t = Triangle.updatePoints(pos, 90, r);
+            sr.setColor(1, 1, 1, 1);
 
-            t.setPos(new Vector2((40*sclf)*i+WIDTH*(.1f),HEIGHT*.8f));
+            t.setPos(new Vector2((40 * sclf) * i + WIDTH * (.1f), HEIGHT * .8f));
             sr.triangle(t);
 
         }
@@ -84,17 +91,21 @@ public class Ship {
 
         Triangle t = new Triangle(shape);
         t.setPos(t.getCenter());
+        if (immune)
+            sr.setColor(Color.BLUE);
+        else
+            sr.setColor(Color.RED);
         sr.triangle(t);
         powerup.render(sr);
     }
 
     public void renderSB(SpriteBatch sb) {
-        sb.draw(powerup.getIcon(), WIDTH * .05f, HEIGHT * .8f);
+        sb.draw(powerup.getIcon(), WIDTH * .05f, HEIGHT * .65f);
         Fonts.getFont().setColor(1, 1, 1, 1);
         setFontSize(10);
-        if(isDead()) {
-            String s="WAIT FOR RESPAWN";
-            Fonts.getFont().draw(sb, s, (WIDTH/2) -(Fonts.getWidth(s)/2), (HEIGHT/2) +(Fonts.getHeight(s)/2));
+        if (isDead()) {
+            String s = "WAIT FOR RESPAWN";
+            Fonts.getFont().draw(sb, s, (WIDTH / 2) - (Fonts.getWidth(s) / 2), (HEIGHT / 2) + (Fonts.getHeight(s) / 2));
 
         }
         Fonts.getFont().draw(sb, "Score: " + player.getScore(), WIDTH * .05f, HEIGHT * .95f);
@@ -139,11 +150,8 @@ public class Ship {
     }
 
     public static void move(Ship s) {
-        if(!s.isDead()) {
-            float m = .5f;
-            float x = (float) (m * Math.cos(Math.toRadians((s.getAngle()))));
-            float y = (float) (m * Math.sin(Math.toRadians((s.getAngle()))));
-            s.vel.add(x, y);
+        if (!s.isDead()) {
+            s.vel.add(Circle.point(new Vector2(0, 0), .5f, s.getAngle()));
         }
     }
 
@@ -162,7 +170,7 @@ public class Ship {
         dt_deathcount.update(dt);
         dtSwap.update(dt);
         powerup.update(dt);
-        if(!isDead()) {
+        if (!isDead()) {
             pos.add(vel.scl(.97f));
             pos.set(wrap(pos));
         }
@@ -192,9 +200,9 @@ public class Ship {
 
     private void setDeath(boolean death) {
         this.death = death;
-        if(death && dt_deathcount.isDone()){
+        if (death && dt_deathcount.isDone()) {
             lives -= 1;
-            pos.set(-999,-999);
+            pos.set(-999, -999);
             dt_deathcount.reset();
 
         }
@@ -202,8 +210,8 @@ public class Ship {
 
     private void respawn() {
         if (AsteroidState.isSpawnClear() && death
-                && lives>0) {
-            vel.set(0,0);
+                && lives > 0) {
+            vel.set(0, 0);
             pos.set(WIDTH / 2, HEIGHT / 2);
             this.death = false;
             angle = 0;
@@ -255,8 +263,10 @@ public class Ship {
     }
 
     public void hit() {
-        setDeath(true);
-        Sounds.boom.play(.7f * Sounds.mainVolume);
+        if (!immune) {
+            setDeath(true);
+            Sounds.boom.play(.7f * Sounds.mainVolume);
+        }
 
     }
 
@@ -301,5 +311,9 @@ public class Ship {
 
     public boolean isDead() {
         return death;
+    }
+
+    public void setImmune(boolean immune) {
+        this.immune = immune;
     }
 }

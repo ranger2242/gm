@@ -1,4 +1,4 @@
-package com.quadx.asteroids.tools;
+package com.quadx.asteroids.tools.hud;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -54,6 +54,11 @@ public class TouchJoystick extends HUDComponent {
 
     @Override
     public void render(SpriteBatch sb) {
+
+    }
+
+    @Override
+    public void setPos(Vector2 v) {
 
     }
 

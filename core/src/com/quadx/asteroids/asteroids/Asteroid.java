@@ -10,6 +10,7 @@ import com.quadx.asteroids.tools.Game;
 
 import java.util.ArrayList;
 
+import static com.quadx.asteroids.states.AsteroidState.player;
 import static com.quadx.asteroids.states.AsteroidState.rn;
 import static com.quadx.asteroids.tools.Game.ft;
 import static com.quadx.asteroids.tools.Game.wrap;
@@ -25,8 +26,8 @@ public class Asteroid {
     private boolean death = false;
     private int size = 3;
     private final Delta dt_flash = new Delta(10 * ft);
-
-
+    private Delta bumped = new Delta(60 * ft);
+    private boolean marked = false;
     private Asteroid(Vector2 pos, float r, float n) {
         this(pos,new Vector2(), r, n, 3,0);
 
@@ -54,8 +55,9 @@ public class Asteroid {
         this.shape = new Ngon(pos, (int)r, (int)n,angle);
         this.shape.scl(Game.scl);
         this.vel.set(vel);
-        this.size = (int)size;
-        this.c.set((rn.nextInt(190)+65)/255f,(rn.nextInt(190)+65)/255f,(rn.nextInt(190)+65)/255f, 1);
+        this.size = (int) size;
+        this.c.set((rn.nextInt(190) + 65) / 255f, (rn.nextInt(190) + 65) / 255f, (rn.nextInt(190) + 65) / 255f, 1);
+        bumped.finish();
     }
 
     private Vector2 ranVel() {
@@ -80,14 +82,50 @@ public class Asteroid {
     }
 
     public void update(float dt) {
+        bumped.update(dt);
+
         dt_flash.update(dt);
         angle+=1f;
+       // shape.setAngle(angle);
         pos.set(wrap(pos));
         move(dt);
+        if (isBumped()) {
+            bumped();
+        }
 
     }
 
 
+    public void bumped() {
+        Vector2 v = new Vector2(player.getVel());
+        v.scl(20);
+
+        Vector2 cs = shape.getCenter();
+        Vector2 cp = player.getPos();
+
+        Vector2 nv = new Vector2();
+        float dx = cs.x - cp.x;
+        float dy = cs.y - cp.y;
+        float theta = (float) Math.atan2(dy, dx);
+
+
+        float dst = cs.dst(cp);
+        float nm = player.getR() + 60 + shape.getR();
+        if (dst < nm) {
+            /*nv.x = (float) (v.x * Math.cos(theta));
+            nv.y = (float) (v.y * Math.sin(theta));
+            this.vel.set(nv);*/
+            Vector2 n = new Vector2();
+            n.x = (float) (cp.x + (nm*1.1 * Math.cos(theta)));
+            n.y = (float) (cp.y + (nm*1.1 * Math.sin(theta)));
+            shape.setPos(n);
+        }
+        bumped.finish();
+        if (bumped.isDone()) {
+            bumped.reset();
+
+        }
+    }
 
 
     public Ngon getShape() {
@@ -127,7 +165,7 @@ public class Asteroid {
         return vel;
     }
 
-    private void setVel(Vector2 vel) {
+    public void setVel(Vector2 vel) {
         this.vel.set(vel);
     }
 
@@ -164,8 +202,8 @@ public class Asteroid {
     public Asteroid[] split() {
         if (size > 1) {
             float r=1.2f;
-            Asteroid r1 = new Asteroid(this.pos.add(6,0), new Vector2(vel.x*r,vel.y*r),this.r / 2, n, size - 1,angle);
-            Asteroid r2 = new Asteroid(this.pos.add(-6,0),new Vector2(vel.y*r,vel.x*r),this.r / 2, n, size - 1,angle);
+            Asteroid r1 = new Asteroid(this.pos.add(20,0), new Vector2(vel.x*r,vel.y*r),this.r / 2, n, size - 1,angle);
+            Asteroid r2 = new Asteroid(this.pos.add(-20,0),new Vector2(vel.y*r,vel.x*r),this.r / 2, n, size - 1,angle);
             return new Asteroid[]{r1, r2};
 
         }
@@ -192,5 +230,17 @@ public class Asteroid {
 
     public float getAngle() {
         return angle;
+    }
+
+
+    public boolean isBumped() {
+        return !bumped.isDone();
+    }
+    public void setMarked(boolean b){
+        marked=b;
+    }
+
+    public boolean isMarked() {
+        return marked;
     }
 }

@@ -3,6 +3,7 @@ package com.quadx.asteroids.asteroids.powerups;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.quadx.asteroids.asteroids.Asteroid;
 import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.shapes1_2.Circle;
 import com.quadx.asteroids.shapes1_2.Ngon;
@@ -23,6 +24,9 @@ public class Bullet extends Powerup {
         dtUse=new Delta(10*ft);
         index=0;
         loadTexture("bullet");
+        name="BULLET";
+        cost=new int[]{100,250,420,700,1000,1500};
+        price=cost[level];
     }
 
     public void update(float dt){
@@ -50,7 +54,8 @@ public class Bullet extends Powerup {
         }
     }
     @Override
-    public boolean collide(Ngon n) {
+    public boolean collide(Asteroid a) {
+        Ngon n= a.getShape();
         for(Shot b: bullets) {
             for (Triangle t : Triangle.triangulate(n)) {
                 if (((Circle)b.getShape()).overlaps(t)) {
@@ -85,6 +90,12 @@ public class Bullet extends Powerup {
         }
         dtUse.reset();
     }
+
+    @Override
+    public int getPrice() {
+        return cost[level];
+    }
+
     public static Circle setPos(float dt, Circle shape, Vector2 vel){
         shape.getCenter().add(vel.x * dt, vel.y * dt);
         return shape;

@@ -9,7 +9,7 @@ public class LevelGenerator {
     static DecimalFormat f3 = new DecimalFormat("#.000");
 
     public static void gen2() {
-        float n = 30;
+        float n = 20;
         float xsep = Game.res.x / 4 / n;
         float r = (Game.res.y / 2);
         float ang = ((360) / n);

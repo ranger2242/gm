@@ -7,6 +7,7 @@ import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.states.MenuState;
 import com.quadx.asteroids.tools.Game;
 
+import static com.quadx.asteroids.states.AsteroidState.hud;
 import static com.quadx.asteroids.tools.Game.mode;
 
 public class ShootComm extends Command {
@@ -17,7 +18,7 @@ public class ShootComm extends Command {
     public void execute() {
         if (cls.equals(MenuState.class)) {
 
-            if (mode == Game.Mode.ANDROID && Game.hud.getMainButton().isPressed()) {
+            if (mode == Game.Mode.ANDROID &&hud.getMainButton().isPressed()) {
                 MenuState.startGame();
             }
         }
@@ -27,7 +28,7 @@ public class ShootComm extends Command {
             if(Gdx.input.isKeyPressed(Input.Keys.SPACE)  && mode== Game.Mode.DESKTOP){
                 Ship.shoot(AsteroidState.player);
             }
-            if(mode== Game.Mode.ANDROID&& Game.hud.getMainButton().isPressed() ){
+            if(mode== Game.Mode.ANDROID&&hud.getMainButton().isPressed() ){
                 Ship.shoot(AsteroidState.player);
             }
 

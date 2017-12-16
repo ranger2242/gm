@@ -1,4 +1,4 @@
-package com.quadx.asteroids.tools;
+package com.quadx.asteroids.tools.hud;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
-public class Button extends HUDComponent{
+public class Button extends HUDComponent {
     private TextButton button;
 
     public Button(String texture, Vector2 pos, Vector2 size){
@@ -31,6 +31,11 @@ public class Button extends HUDComponent{
     public void update (float dt) {
     }
     public void render(SpriteBatch sb){
+
+    }
+
+    @Override
+    public void setPos(Vector2 v) {
 
     }
 

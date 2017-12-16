@@ -20,6 +20,7 @@ import com.quadx.asteroids.tools.Delta;
 import com.quadx.asteroids.tools.FPSModule;
 import com.quadx.asteroids.tools.Game;
 import com.quadx.asteroids.tools.Sounds;
+import com.quadx.asteroids.tools.hud.HUD;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +43,8 @@ public class AsteroidState extends State {
     private static boolean gameover = false;
     private static final FPSModule fpsModule = new FPSModule();
     private static GameStateManager gsm;
-    private static int level =2;
+    private static int level =0;
+    public static HUD hud;
 
     //////////////////////////////////////////
     //init
@@ -53,6 +55,7 @@ public class AsteroidState extends State {
         sr = new ShapeRendererExt();
         sr.setAutoShapeType(true);
         startGame();
+
     }
 
     private static void startGame() {
@@ -69,6 +72,10 @@ public class AsteroidState extends State {
         waveCounter.setColor(Color.WHITE);
 
         gameover = false;
+    }
+
+    public static ArrayList<Asteroid> getRocks() {
+        return rocks;
     }
 
     //////////////////////////////////////////

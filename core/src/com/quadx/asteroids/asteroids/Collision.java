@@ -18,7 +18,7 @@ public class Collision {
     }
 
     public void collide(Asteroid a, Powerup p){
-        if (p.collide(a.getShape())) {
+        if (p.collide(a)) {
             AsteroidState.rockHit(a);
             a.wasShot();
         }

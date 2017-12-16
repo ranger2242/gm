@@ -50,6 +50,7 @@ class Shot {
         dt=new Delta(2000*ft);
     }
 
+
     public void updateIndividual(float dt) {
         if(type.equals(Laser.class)){
            shape= Laser.setPos(dt,(Line) shape,angle,radius);

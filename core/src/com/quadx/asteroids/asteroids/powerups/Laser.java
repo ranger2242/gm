@@ -3,11 +3,11 @@ package com.quadx.asteroids.asteroids.powerups;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.quadx.asteroids.anims.RechargeAnim;
+import com.quadx.asteroids.asteroids.Asteroid;
 import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.shapes1_2.Line;
 import com.quadx.asteroids.shapes1_2.Ngon;
 import com.quadx.asteroids.shapes1_2.ShapeRendererExt;
-import com.quadx.asteroids.shapes1_2.Triangle;
 import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.tools.Delta;
 
@@ -32,6 +32,10 @@ public class Laser extends Powerup {
         dtUse = new Delta(dlim);
         index = 1;
         loadTexture("laser");
+        name="LASER";
+        cost=new int[]{200,500,840,1400,2000,3000};
+        price=cost[level];
+
     }
 
 
@@ -100,15 +104,13 @@ public class Laser extends Powerup {
     }
 
 
-    public boolean collide(Ngon n) {
-        for (Triangle t : Triangle.triangulate(n)) {
-            for (Line a : Line.asLines(t)) {
-                for(Shot b: bullets) {
-                    if (Line.intersectsLine(a,(Line) b.getShape()))
-                        return true;
-                }
-            }
+    public boolean collide(Asteroid a) {
+        Ngon n= a.getShape();
+        for(Shot b: bullets) {
+            if(((Line)b.getShape()).intersects(n))
+                return true;
         }
+
         return false;
     }
 

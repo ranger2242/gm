@@ -12,14 +12,13 @@ import com.quadx.asteroids.states.MenuState;
 import java.util.ArrayList;
 
 public class Game extends ApplicationAdapter {
-    private SpriteBatch batch;
+    public static SpriteBatch batch;
     public static GameStateManager gsm;
     public static int HEIGHT = 900;
     public static int WIDTH = 1800;
     public final static float ft = 1f / 60f;
     public static final ArrayList<Command> queue = new ArrayList<>();
     public static Mode mode = Mode.DESKTOP;
-    public static HUD hud;
     public static float sclf=0;
     public static Vector2 scl = new Vector2(1, 1);
     public static final Vector2 res = new Vector2();
@@ -68,17 +67,16 @@ public class Game extends ApplicationAdapter {
         queue.add(new UpgradeComm());
         queue.add(new JoystickMoveComm());
 
-        hud = new HUD(batch);
 
     }
 
     @Override
     public void render() {
         Command.cls=gsm.peek().getClass();
-        hud.update(Gdx.graphics.getDeltaTime());
         gsm.update(Gdx.graphics.getDeltaTime());
+        //hud.update(Gdx.graphics.getDeltaTime());
         gsm.render(batch);
-        hud.render(batch);
+        //hud.render(batch);
 
     }
 

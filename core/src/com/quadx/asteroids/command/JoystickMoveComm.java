@@ -4,6 +4,7 @@ import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.tools.Game;
 
+import static com.quadx.asteroids.states.AsteroidState.hud;
 import static com.quadx.asteroids.tools.Game.mode;
 
 /**
@@ -19,8 +20,8 @@ public class JoystickMoveComm extends Command {
 
         if (cls.equals(AsteroidState.class)) {
             if(mode== Game.Mode.ANDROID)
-            if (Game.hud.getTouchJoyStick().getDirection().x != 0 || Game.hud.getTouchJoyStick().getDirection().y != 0) {
-                Ship.move(AsteroidState.player, Game.hud.getTouchJoyStick().getDirection());
+            if (hud.getTouchJoyStick().getDirection().x != 0 ||hud.getTouchJoyStick().getDirection().y != 0) {
+                Ship.move(AsteroidState.player, hud.getTouchJoyStick().getDirection());
             }
 
         }
