@@ -26,12 +26,11 @@ class Shot {
     public Shot(Vector2 pos, Vector2 vel, float theta, float off) {//Bullet
         shape = new Circle(new Vector2(pos), 2f * scl.x);
 
-        float m = 500;
+        float m = 9;
         angle=theta + (-off / 2);
-        float vx = m * (float) (Math.cos(Math.toRadians(angle)));
-        float vy = m * (float) (Math.sin(Math.toRadians(angle)));
-        this.vel.set(vel);
-        this.vel.add(vx, vy);
+        Vector2 v= Circle.point(new Vector2(),m,angle);
+        v.add(vel);
+        this.vel.set(v);
     }
 
 

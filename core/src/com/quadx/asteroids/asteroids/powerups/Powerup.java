@@ -20,6 +20,8 @@ public abstract class Powerup {
     protected int index= -1;
     protected int price= 0;
     protected int level=0;
+    protected int maxlevel=0;
+
     protected int[] cost= null;
     protected Delta dtUse= new Delta(ft);
     protected Texture icon;
@@ -59,5 +61,12 @@ public abstract class Powerup {
 
     public int getPrice() {
         return price;
+    }
+
+    public boolean isUpgradable(){
+        return level<maxlevel;
+    }
+    public int getLevel() {
+        return level;
     }
 }

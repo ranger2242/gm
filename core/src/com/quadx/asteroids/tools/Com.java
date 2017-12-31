@@ -3,47 +3,46 @@ package com.quadx.asteroids.tools;
 import com.google.gson.Gson;
 import com.quadx.asteroids.asteroids.Asteroid;
 import com.quadx.asteroids.states.AsteroidState;
+import com.quadx.asteroids.states.LobbyState;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
  * Created by Chris Cavazos on 12/10/2017.
  */
 public class Com {
+    ArrayList<String> lobbiedPlayers = new ArrayList<>();
+    ArrayList<String> rooms = new ArrayList<>();
+
     private String ip = getIp();
     private String port = "2242";
     private String dir = "http://" + ip + ":" + port;
     private Socket socket;
     private final Gson gson;
     private int index = 0;
-    private String id = "";
+    private String serverID = "";
+    private String numInLobby="";
 
-    public Com(){
+    public Com() {
         gson = new Gson();
 
     }
 
-    public void connect() {
-        connectionHandler();
-    }
-    private void connectionHandler() {
-        //outc("Attemping to connect");
-
+    public void connect(String ip) {
         try {
+            dir = "http://" + ip + ":" + port;
             connectSocket();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        //outc("Socket opened on " + dir);
-
-
     }
 
-    public boolean validIP(String ip) {
+    public static boolean validIP(String ip) {
         try {
             if (ip == null || ip.isEmpty()) {
                 return false;
@@ -97,11 +96,35 @@ public class Com {
             }
 
         });
-        socket.on("syncID", new Emitter.Listener() {
+        socket.on("storeID", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                String[] s = gson.fromJson(args[0].toString(), String[].class);
-                index = Arrays.asList(s).indexOf(id);
+                serverID= args[0].toString();
+                numInLobby=args[1].toString();
+                System.out.println(serverID+" "+numInLobby);
+            }
+
+        });
+        socket.on("sendPlayerList", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                String s= args[0].toString();
+                String[] arr = s.split("~");
+                lobbiedPlayers=new ArrayList<>(Arrays.asList(arr));
+                for(String s1:lobbiedPlayers){
+                    System.out.println(s1);
+
+                }
+            }
+
+        });
+        socket.on("sendRoomList", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                String s= args[0].toString();
+                String[] arr = s.split("~");
+                rooms=new ArrayList<>(Arrays.asList(arr));
+                LobbyState.setRooms=true;
             }
 
         });
@@ -120,18 +143,10 @@ public class Com {
             }
 
         });
-        socket.on("storeIndex", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                index = Integer.parseInt(args[0].toString());
-                id = args[1].toString();
-            }
-
-        });
         socket.on("receiveCount", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-               // MenuState.numPlayers = gson.fromJson(args[0].toString(), Integer.class);
+                // MenuState.numPlayers = gson.fromJson(args[0].toString(), Integer.class);
             }
 
         });
@@ -169,7 +184,7 @@ public class Com {
         socket.on("addRock", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-              //  rocks.add(0, gson.fromJson(args[0].toString(), Asteroid.class));
+                //  rocks.add(0, gson.fromJson(args[0].toString(), Asteroid.class));
             }
 
         });
@@ -194,7 +209,6 @@ public class Com {
         });
         socket.connect();
     }
-
 
 
     private String getIp() {
@@ -238,4 +252,15 @@ public class Com {
         */
     }
 
+    public ArrayList<String> getLobbied() {
+        return lobbiedPlayers;
+    }
+
+    public void emit(String msg, String... n) {
+        socket.emit(msg,n);
+    }
+
+    public ArrayList<String> getRooms() {
+        return rooms;
+    }
 }

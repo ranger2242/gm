@@ -48,7 +48,7 @@ public class Game extends ApplicationAdapter {
     @Override
     public void create() {
         waves=FileHandler.initFile();
-        LevelGenerator.gen2();
+        //LevelGenerator.gen2();
         Sounds.load();
         Fonts.initFonts();
         Gdx.graphics.setTitle("TicTacToe");

@@ -44,7 +44,7 @@ public class FPSModule {
     }
 
     public void render(SpriteBatch sb, ShapeRendererExt shapeR, Vector2 pos) {
-        if (enabled) { //TODO optomize this to draw faster
+        if (enabled) { //TODO optomize this to render faster
             //DRAW FPS meter
             shapeR.begin(ShapeRenderer.ShapeType.Filled);
             shapeR.setColor(BLACK);
@@ -68,7 +68,7 @@ public class FPSModule {
                 prev1 = memUsageList.get(i);
             }
             shapeR.end();
-            //draw fps counter
+            //render fps counter
             sb.begin();
             if (enabled) {
                 Fonts.setFontSize(5);

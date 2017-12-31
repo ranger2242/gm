@@ -43,7 +43,7 @@ public class AsteroidState extends State {
     private static boolean gameover = false;
     private static final FPSModule fpsModule = new FPSModule();
     private static GameStateManager gsm;
-    private static int level =0;
+    public static int level =0;
     public static HUD hud;
 
     //////////////////////////////////////////

@@ -32,7 +32,7 @@ public class MultiplayerState extends State {
         sr.setAutoShapeType(true);
         TextBox box = new TextBox();
         Gdx.input.getTextInput(box, "ip", "", "");
-        setFontSize(30);
+        setFontSize(10);
     }
 
     @Override

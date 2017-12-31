@@ -112,9 +112,6 @@ public class Asteroid {
         float dst = cs.dst(cp);
         float nm = player.getR() + 60 + shape.getR();
         if (dst < nm) {
-            /*nv.x = (float) (v.x * Math.cos(theta));
-            nv.y = (float) (v.y * Math.sin(theta));
-            this.vel.set(nv);*/
             Vector2 n = new Vector2();
             n.x = (float) (cp.x + (nm*1.1 * Math.cos(theta)));
             n.y = (float) (cp.y + (nm*1.1 * Math.sin(theta)));

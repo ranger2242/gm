@@ -18,9 +18,9 @@ public class ShootComm extends Command {
     public void execute() {
         if (cls.equals(MenuState.class)) {
 
-            if (mode == Game.Mode.ANDROID &&hud.getMainButton().isPressed()) {
+    /*        if (mode == Game.Mode.ANDROID &&hud.getMainButton().isPressed()) {
                 MenuState.startGame();
-            }
+            }*/
         }
 
         if (cls.equals(AsteroidState.class)) {

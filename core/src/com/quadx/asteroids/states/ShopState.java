@@ -16,13 +16,15 @@ import com.quadx.asteroids.command.Command;
 import com.quadx.asteroids.shapes1_2.ShapeRendererExt;
 import com.quadx.asteroids.tools.Fonts;
 import com.quadx.asteroids.tools.Game;
+import com.quadx.asteroids.tools.HoverText;
 import com.quadx.asteroids.tools.hud.ShopModule;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import static com.badlogic.gdx.graphics.GL20.GL_BLEND;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
-import static com.quadx.asteroids.states.AsteroidState.hud;
+import static com.quadx.asteroids.states.AsteroidState.player;
 import static com.quadx.asteroids.tools.Game.*;
 import static com.quadx.asteroids.tools.Text.strWidth;
 
@@ -31,16 +33,17 @@ import static com.quadx.asteroids.tools.Text.strWidth;
  */
 
 public class ShopState extends State {
-    private final ArrayList<ShopModule> modules = new ArrayList<>();
+    private static final ArrayList<ShopModule> modules = new ArrayList<>();
     private final ShapeRendererExt sr = new ShapeRendererExt();
     private float edge;
-    private final ArrayList<Powerup> powerups = new ArrayList<>();
+    private static final ArrayList<Powerup> powerups = new ArrayList<>();
     private ArrayList<Powerup> pl = new ArrayList<>();
     Texture base = new Texture("hud/button/shop/base.png");
-    private final Stage stage;
+    private static Stage stage = null;
 
     public ShopState(GameStateManager gsm) {
         super(gsm);
+        powerups.clear();
         edge = 25 * sclf;
         sr.setAutoShapeType(true);
         powerups.add(new Bullet());
@@ -56,15 +59,17 @@ public class ShopState extends State {
 
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
-//add actors
+        refactorButtons();
 
     }
 
     @Override
     protected void handleInput() {
+        if (Gdx.input.isKeyPressed(Input.Keys.F12)) {
+            player.addMoney(5);
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.TAB)) {
-            hud.removeShopComponents();
-            AsteroidState.player.setPowerUp(hud.getSelected());
+            stage.clear();
             AsteroidState.nextWave();
             gsm.pop();
             Command.cls = gsm.peek().getClass();
@@ -89,7 +94,6 @@ public class ShopState extends State {
         float[] s = fitLineToWord(st);
         float x = t.x;
         float y = t.y;
-        sr.setColor(Color.WHITE);
         sr.line(x + s[0], y + s[1], x + s[2], y + s[3]);
         sr.line(x + s[4], y + s[5], x + s[6], y + s[7]);
     }
@@ -102,6 +106,16 @@ public class ShopState extends State {
     @Override
     public void update(float dt) {
         handleInput();
+        for (int i = 0; i < modules.size(); i++)
+            modules.get(i).update(dt);
+        try {
+
+            for (HoverText h : HoverText.texts) {
+                h.update();
+            }
+        } catch (ConcurrentModificationException ex) {
+
+        }
     }
 
     //////////////////////////////////////////
@@ -113,9 +127,6 @@ public class ShopState extends State {
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-//start draw
-
-        float n = powerups.size();
 
 
         sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -124,40 +135,39 @@ public class ShopState extends State {
 
         sr.set(ShapeRenderer.ShapeType.Line);
 
-        Vector2 t = new Vector2(WIDTH * .6f, HEIGHT - ((edge + 25) * Game.scl.y));
-        Fonts.setFontSize(10);
+        Vector2 t = new Vector2(WIDTH * .6f, HEIGHT * .95f);
+        Fonts.setFontSize(6);
+        sr.setColor(Color.BLUE);
         titleLine("SHOP", t);
+        titleLine("EQUIPMENT", new Vector2(WIDTH * .05f, t.y));
+
         sr.line(new Vector2(WIDTH * .3f, HEIGHT * .1f), new Vector2(WIDTH * .3f, HEIGHT * .9f));
-        sr.setColor(Color.GREEN);
-        for (int i = 0; i < n; i++) {
-            float b = (int) (n / 2) + 1;
-            float r = i < b ? .5f : .8f;
-            Vector2 v = new Vector2(WIDTH * r, HEIGHT * (.8f - ((i % b) * .18f)) - (HEIGHT * .01f));
-            Vector2 v2 = new Vector2(v.x - (WIDTH * .15f), v.y);
-            sr.line(v, v2);
 
+        for (ShopModule m : modules) {
+            m.renderSR(sr);
         }
-
-
         sr.end();
         Gdx.gl.glDisable(GL_BLEND);
         sb.begin();
+        Fonts.getFont().setColor(Color.WHITE);
+        Fonts.resetAlpha();
         Fonts.getFont().draw(sb, "SHOP", t.x, t.y);
+        Fonts.getFont().draw(sb, "EQUIPMENT", WIDTH * .05f, t.y);
+        Fonts.getFont().draw(sb, "MONEY: " + player.getMoney(), WIDTH * .05f, t.y - 50);
+        Fonts.getFont().draw(sb,"EXIT:TAB",WIDTH*.05f,HEIGHT*.075f);
+
+
         Fonts.setFontSize(4);
 
-        for (int i = 0; i < n; i++) {
-            float b = (int) (n / 2) + 1;
-            float r = i < b ? .5f : .8f;
-            Vector2 v = new Vector2(WIDTH * r, HEIGHT * (.8f - ((i % b) * .18f)));
-            Fonts.getFont().draw(sb, powerups.get(i).getName(), v.x - (WIDTH * .15f), v.y + (HEIGHT * .02f));
-            ShopModule m = new ShopModule(new Vector2(v.x - (WIDTH * .15f), v.y + (HEIGHT * .05f)));
-            for(Actor a : m.getActors()) {
-                stage.addActor(a);
+        for (ShopModule m : modules) {
+            m.render(sb);
+        }
+        try {
+            for (HoverText h : HoverText.texts) {
+                h.render(sb);
             }
+        } catch (ConcurrentModificationException ex) {
 
-            Fonts.getFont().draw(sb, "$" + powerups.get(i).getPrice(), v.x, v.y);
-
-            sb.draw(powerups.get(i).getIcon(), v.x, v.y);
         }
         drawPlayerSlots(sb);
         sb.end();
@@ -166,10 +176,21 @@ public class ShopState extends State {
     }
 
     private void drawPlayerSlots(SpriteBatch sb) {
-        for (int i = 0; i < 3; i++) {
+        Fonts.getFont().setColor(Color.WHITE);
+        Fonts.resetAlpha();
+        Fonts.setFontSize(4);
+        for (int i = 0; i < 4; i++) {
+            Vector2 pos = new Vector2(WIDTH * .05f, HEIGHT * (.7f - (i * .2f)));
+            ArrayList<Powerup> ups = player.getActivePowerups();
+            if (i < ups.size()) {
+                Texture t = ups.get(i).getIcon();
+                sb.draw(t, pos.x, pos.y);
+                Fonts.getFont().draw(sb, ups.get(i).getName() + " L:" + (ups.get(i).getLevel() + 1), pos.x + (WIDTH * .1f), pos.y + (HEIGHT * .05f));
+            } else
+                sb.draw(base, pos.x, pos.y);
+
 
         }
-        sb.draw(base, WIDTH * .1f, HEIGHT * .5f);
     }
 
     void drawBackground(ShapeRendererExt sr) {
@@ -185,4 +206,41 @@ public class ShopState extends State {
     }
 
 
+    public static void refactorButtons() {
+        modules.clear();
+        stage.clear();
+        ArrayList<Powerup> owned = player.getPowerups();
+
+        float n = powerups.size();
+        for (int i = 0; i < n; i++) {
+            float b = (int) (n / 2) + 1;
+            float r = i < b ? .5f : .8f;
+            Vector2 v = new Vector2(WIDTH * r, HEIGHT * (.8f - ((i % b) * .18f)) - (HEIGHT * .01f));
+            ShopModule m = new ShopModule(v, powerups.get(i));
+            for (Powerup p : owned) {
+                if (p.getClass().equals(powerups.get(i).getClass())) {
+                    m.enableBuy(false);
+                    m.enableAdd(true);
+                    if (p.isUpgradable())
+                        m.enableUpgrade(true);
+                    else
+                        m.enableUpgrade(false);
+
+                }
+            }
+            for (Powerup p : player.getActivePowerups()) {
+                if (p.getClass().equals(powerups.get(i).getClass())) {
+                    m.enableAdd(false);
+                    m.enableSub(true);
+
+                }
+            }
+            if (player.getActivePowerups().size() == 4)
+                m.enableAdd(false);
+            for (Actor a : m.getActors()) {
+                stage.addActor(a);
+            }
+            modules.add(m);
+        }
+    }
 }

@@ -43,4 +43,8 @@ public class Fonts {
         return l.height;
 
     }
+
+    public static void resetAlpha() {
+        font.getColor().a=1;
+    }
 }

@@ -35,7 +35,7 @@ public class Laser extends Powerup {
         name="LASER";
         cost=new int[]{200,500,840,1400,2000,3000};
         price=cost[level];
-
+        maxlevel=5;
     }
 
 
@@ -116,10 +116,11 @@ public class Laser extends Powerup {
 
     @Override
     public void upgrade() {
-        if(dtUpgrade.isDone()) {
+        //if(dtUpgrade.isDone()) {
             n++;
-            dtUpgrade.reset();
-        }
+            level++;
+          //  dtUpgrade.reset();
+        //}
     }
 
     public void removeDead(){

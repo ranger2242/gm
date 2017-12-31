@@ -18,7 +18,7 @@ public class UpgradeComm extends Command {
     public void execute() {
         if(cls.equals(AsteroidState.class)){
             if(mode== Game.Mode.ANDROID&& hud.getIncButton().isPressed() ){
-                Ship.upgradePower(AsteroidState.player);
+                Ship.hold(AsteroidState.player);
             }
         }
     }
