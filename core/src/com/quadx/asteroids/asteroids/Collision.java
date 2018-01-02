@@ -12,6 +12,9 @@ public class Collision {
             boolean b = t.overlaps(s.getShape());
             boolean c = !s.isGameOver();
             if ((a1 || b) && c) {
+                a1 = s.getShape().overlaps(t);
+                b = t.overlaps(s.getShape());
+                c = !s.isGameOver();
                 s.hit();
             }
         }

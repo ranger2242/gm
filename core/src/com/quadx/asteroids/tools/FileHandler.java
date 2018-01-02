@@ -41,8 +41,12 @@ public class FileHandler {
                         s = f.get(c++);
                         String[] ars2 = s.split(" ");
                         float[] parsed2 = new float[ars2.length];
-                        for (int j = 0; j < ars2.length; j++) {
-                            parsed2[j] = Float.parseFloat(ars2[j]);
+                        try {
+                            for (int j = 0; j < ars2.length; j++) {
+                                parsed2[j] = Float.parseFloat(ars2[j]);
+                            }
+                        }catch (NumberFormatException e){
+                            System.out.println(c);
                         }
                         Asteroid p = new Asteroid(new Vector2(Game.res.x * parsed2[0], Game.res.y * parsed2[1]),
                                 new Vector2(parsed2[2], parsed2[3]), parsed2[4], parsed2[5], parsed2[6], parsed2[7]);

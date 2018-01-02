@@ -1,9 +1,8 @@
 package com.quadx.asteroids.tools;
 
 import com.google.gson.Gson;
-import com.quadx.asteroids.asteroids.Asteroid;
-import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.states.LobbyState;
+import com.quadx.asteroids.states.RoomState;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -12,10 +11,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.quadx.asteroids.tools.Game.gsm;
+
 /**
  * Created by Chris Cavazos on 12/10/2017.
  */
 public class Com {
+    ArrayList<String> roomPlayers = new ArrayList<>();
     ArrayList<String> lobbiedPlayers = new ArrayList<>();
     ArrayList<String> rooms = new ArrayList<>();
 
@@ -25,8 +27,9 @@ public class Com {
     private Socket socket;
     private final Gson gson;
     private int index = 0;
-    private String serverID = "";
-    private String numInLobby="";
+    public String serverID = "";
+    private String numInLobby = "";
+    public String room="";
 
     public Com() {
         gson = new Gson();
@@ -92,111 +95,57 @@ public class Com {
         socket.on("start", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-
+                RoomState.loadGame();
             }
 
         });
         socket.on("storeID", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                serverID= args[0].toString();
-                numInLobby=args[1].toString();
-                System.out.println(serverID+" "+numInLobby);
+                serverID = args[0].toString();
+                numInLobby = args[1].toString();
+                System.out.println(serverID + " " + numInLobby);
             }
 
         });
         socket.on("sendPlayerList", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                String s= args[0].toString();
+                String s = args[0].toString();
                 String[] arr = s.split("~");
-                lobbiedPlayers=new ArrayList<>(Arrays.asList(arr));
-                for(String s1:lobbiedPlayers){
+                lobbiedPlayers = new ArrayList<>(Arrays.asList(arr));
+                for (String s1 : lobbiedPlayers) {
                     System.out.println(s1);
-
                 }
+            }
+
+        });
+        socket.on("roomNames", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                String s = args[0].toString();
+                String[] arr = s.split("~");
+                roomPlayers = new ArrayList<>(Arrays.asList(arr));
             }
 
         });
         socket.on("sendRoomList", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                String s= args[0].toString();
+                String s = args[0].toString();
                 String[] arr = s.split("~");
-                rooms=new ArrayList<>(Arrays.asList(arr));
-                LobbyState.setRooms=true;
+                rooms = new ArrayList<>(Arrays.asList(arr));
+                LobbyState.setRooms = true;
             }
 
         });
-        socket.on("allDead", new Emitter.Listener() {
+        socket.on("joinSuccess", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-             /*   gameover = gson.fromJson(args[0].toString(), Boolean.class);
-                if (gameover) {
-                    socket.emit("stop");
-                    started = false;
-                    player.setHost(false);
-                    rocks.clear();
-                    Sounds.gameOver.play();
-
-                }*/
-            }
-
-        });
-        socket.on("receiveCount", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                // MenuState.numPlayers = gson.fromJson(args[0].toString(), Integer.class);
-            }
-
-        });
-
-        socket.on("receiveRocks", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                AsteroidState.setRocks(gson.fromJson(args[0].toString(), Asteroid[].class));
-            }
-
-        });
-        socket.on("removeRock", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-               /* int x = rocks.size();
-                int z = gson.fromJson(args[0].toString(), Integer.class);
-
-                try {
-                    rocks.remove(z);
-                } catch (IndexOutOfBoundsException | ConcurrentModificationException e) {
-                }
-                int y = rocks.size();
-                System.out.println(x + " " + z + " " + y);*/
-            }
-
-        });
-        socket.on("addRocks", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                /*rocks.add(0, gson.fromJson(args[1].toString(), Asteroid.class));
-                rocks.add(0, gson.fromJson(args[0].toString(), Asteroid.class));*/
-            }
-
-        });
-        socket.on("addRock", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                //  rocks.add(0, gson.fromJson(args[0].toString(), Asteroid.class));
-            }
-
-        });
-        socket.on("receiveShips", new Emitter.Listener() {//on connect
-            @Override
-            public void call(Object... args) {
-
-          /*      otherPlayers = gson.fromJson(args[0].toString(), Triangle[].class);
-                ArrayList<Triangle> a = new ArrayList<>(Arrays.asList(otherPlayers));
-                a.remove(index);
-                otherPlayers = Arrays.copyOf(a.toArray(), a.size(), Triangle[].class);
-*/
+                room=args[0].toString();
+                RoomState state = new RoomState(gsm, room);
+                gsm.pop();
+                gsm.push(state);
             }
 
         });
@@ -256,11 +205,21 @@ public class Com {
         return lobbiedPlayers;
     }
 
+    public ArrayList<String> getRoom() {
+        return roomPlayers;
+    }
+
     public void emit(String msg, String... n) {
-        socket.emit(msg,n);
+        socket.emit(msg, n);
     }
 
     public ArrayList<String> getRooms() {
         return rooms;
+    }
+
+    public void dispose() {
+        if(!room.equals("")){
+            socket.emit("dropPlayer",room,serverID);
+        }
     }
 }

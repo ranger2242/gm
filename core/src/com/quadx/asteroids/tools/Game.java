@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.quadx.asteroids.asteroids.Wave;
 import com.quadx.asteroids.command.*;
 import com.quadx.asteroids.states.GameStateManager;
+import com.quadx.asteroids.states.LobbyState;
 import com.quadx.asteroids.states.MenuState;
 
 import java.util.ArrayList;
@@ -82,6 +83,7 @@ public class Game extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        LobbyState.comm.dispose();
         batch.dispose();
 
     }

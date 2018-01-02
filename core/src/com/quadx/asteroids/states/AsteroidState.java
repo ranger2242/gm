@@ -58,7 +58,7 @@ public class AsteroidState extends State {
 
     }
 
-    private static void startGame() {
+    public static void startGame() {
         Wave w= new Wave(waves.get(level));
 
         dtSpawn = new Delta(2 * 120 * ft);
@@ -71,6 +71,7 @@ public class AsteroidState extends State {
         waveCounter.setRadius(48);
         waveCounter.setColor(Color.WHITE);
 
+        started=true;
         gameover = false;
     }
 
@@ -311,5 +312,9 @@ public class AsteroidState extends State {
         waveCounter.setColor(Color.WHITE);
 
         gameover = false;
+    }
+
+    public static void start() {
+        started=true;
     }
 }

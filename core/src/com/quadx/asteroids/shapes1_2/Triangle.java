@@ -54,9 +54,12 @@ public class Triangle extends Shape{
     boolean overlaps(ArrayList<Line> lines){
         ArrayList<Line> triLines = Line.asLines(this);
         boolean ov = false;
-        for (Line l1 : triLines) {
-            for (Line l2 : lines) {
-                ov = ov || Line.intersectsLine(l1, l2);
+        for (int i=0;i<triLines.size();i++) {
+            Line l1 =triLines.get(i);
+            for (int j=0;j<lines.size();j++) {
+                Line l2 =lines.get(j);
+                ov = ov || l1.intersects(l2);
+                System.out.println("");
             }
         }
         return ov;

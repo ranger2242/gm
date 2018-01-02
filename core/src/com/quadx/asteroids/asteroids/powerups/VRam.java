@@ -107,7 +107,7 @@ public class VRam extends Powerup {
         Ngon n= a.getShape();
         for (Triangle t : Triangle.triangulate(n)) {
             for (Line l : Line.asLines(t)) {
-                if (Line.intersectsLine(l, l1) || Line.intersectsLine(l, l2)) {
+                if (l.intersects(l1) ||l.intersects(l2)) {
                     return true;
                 }
             }

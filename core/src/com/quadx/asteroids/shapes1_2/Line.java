@@ -22,33 +22,21 @@ public class Line extends Shape {
         this(new Vector2(), new Vector2());
     }
 
-    public boolean intersects(Line b) {
-        float denominator = ((this.b.x - this.a.x) * (b.b.y - b.a.y)) - ((this.b.y - this.a.y) * (b.b.x - b.a.x));
-        float numerator1 = ((this.a.y - b.a.y) * (b.b.x - b.a.x)) - ((this.a.x - b.a.x) * (b.b.y - b.a.y));
-        float numerator2 = ((this.a.y - b.a.y) * (this.b.x - this.a.x)) - ((this.a.x - b.a.x) * (this.b.y - this.a.y));
+    public boolean intersects(Line l1){
+        float s1x, s1y, s2x, s2y;
+        s1x = this.b.x - this.a.x;
+        s1y = this.b.y - this.a.y;
 
-        // Detect coincident lines (has a problem, read below)
-        if (denominator == 0) return numerator1 == 0 && numerator2 == 0;
-
-        float r = numerator1 / denominator;
-        float s = numerator2 / denominator;
-
-        return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
+        s2x = l1.b.x - l1.a.x;
+        s2y = l1.b.y - l1.a.y;
+        float s = (-s1y * (this.a.x - l1.a.x) + s1x * (this.a.y - l1.a.y)) / (-s2x * s1y + s1x * s2y);
+        float t = (s2x * (this.a.y - l1.a.y) - s2y * (this.a.x - l1.a.x)) / (-s2x * s1y + s1x * s2y);
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            return true;
+        }
+        return false;
     }
 
-    public static boolean intersectsLine(Line a, Line b) {
-        float denominator = ((a.b.x - a.a.x) * (b.b.y - b.a.y)) - ((a.b.y - a.a.y) * (b.b.x - b.a.x));
-        float numerator1 = ((a.a.y - b.a.y) * (b.b.x - b.a.x)) - ((a.a.x - b.a.x) * (b.b.y - b.a.y));
-        float numerator2 = ((a.a.y - b.a.y) * (a.b.x - a.a.x)) - ((a.a.x - b.a.x) * (a.b.y - a.a.y));
-
-        // Detect coincident lines (has a problem, read below)
-        if (denominator == 0) return numerator1 == 0 && numerator2 == 0;
-
-        float r = numerator1 / denominator;
-        float s = numerator2 / denominator;
-
-        return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
-    }
 
     public static ArrayList<Line> asLines(Triangle t) {
         float[] points = t.getPoints();

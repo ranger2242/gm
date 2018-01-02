@@ -1,6 +1,7 @@
 package com.quadx.asteroids.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -22,17 +23,25 @@ import static com.quadx.asteroids.tools.Game.WIDTH;
  * Created by Chris Cavazos on 12/30/2017.
  */
 public class LobbyState extends State {
-    static Com com = new Com();
+    public static Com comm = new Com();
     ArrayList<Button> roomButtons = new ArrayList<>();
     private static Stage stage;
     static Skin skin;
     static TextField nameField;
     static Button makeRoomB;
     public static boolean setRooms = false;
+    boolean joining = false;
 
     LobbyState(GameStateManager gsm, String ip) {
         super(gsm);
-        com.connect(ip);
+        comm.connect(ip);
+        init();
+    }
+    LobbyState(GameStateManager gsm){
+        super(gsm);
+       init();
+    }
+    void init(){
         ScreenViewport viewport = new ScreenViewport();
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
         stage = new Stage(viewport, Game.batch);
@@ -43,15 +52,18 @@ public class LobbyState extends State {
 
     @Override
     protected void handleInput() {
-
+        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)||Gdx.input.isKeyPressed(Input.Keys.TAB)){
+            gsm.pop();
+        }
         if (makeRoomB.isPressed()) {
             String n = nameField.getText();
             nameField.clearSelection();
-            com.emit("makeRoom", n);
+            comm.emit("makeRoom", n);
         }
         for(Button b: roomButtons){
-            if(b.isPressed()){
-                com.emit("joinRoom",b.getText());
+            if(b.isPressed()&& !joining){
+                comm.emit("joinRoom",b.getText());
+                joining=true;
             }
         }
     }
@@ -69,7 +81,7 @@ public class LobbyState extends State {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        ArrayList<String> list = com.getLobbied();
+        ArrayList<String> list = comm.getLobbied();
         sb.begin();
         for (int i = 0; i < list.size(); i++) {
             Fonts.getFont().draw(sb, list.get(i), WIDTH * .1f, HEIGHT * (.8f - (.05f * i)));
@@ -91,7 +103,7 @@ public class LobbyState extends State {
         stage.addActor(makeRoomB.getActor());
         stage.addActor(nameField);
 
-        ArrayList<String> list = com.getRooms();
+        ArrayList<String> list = comm.getRooms();
         Button b;
 
         for (int i =0;i <list.size();i++) {

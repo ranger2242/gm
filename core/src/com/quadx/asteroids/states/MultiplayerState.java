@@ -19,20 +19,26 @@ import static com.quadx.asteroids.tools.Fonts.setFontSize;
  * Created by Chris Cavazos on 8/14/2017.
  */
 public class MultiplayerState extends State {
-    private final ShapeRendererExt sr = new ShapeRendererExt();
-    private final ArrayList<String> output = new ArrayList<>();
-    private static final Triangle[] otherPlayers = new Triangle[0];
+    private ShapeRendererExt sr = new ShapeRendererExt();
+    private ArrayList<String> output = new ArrayList<>();
+    private static Triangle[] otherPlayers = new Triangle[0];
     private static Com com = new Com();
+    boolean init = false;
 
     public MultiplayerState(GameStateManager gsm) {
         super(gsm);
+        init = true;
+    }
+
+    void init() {
         Command.cls = AsteroidState.class;
-        this.gsm = gsm;
         output.clear();
         sr.setAutoShapeType(true);
         TextBox box = new TextBox();
         Gdx.input.getTextInput(box, "ip", "", "");
         setFontSize(10);
+        init=false;
+        AsteroidState.startGame();
     }
 
     @Override
@@ -47,6 +53,8 @@ public class MultiplayerState extends State {
             Command.cls = AsteroidState.class;
             AsteroidState.updateLoop(dt);
         }
+        if(init)
+            init();
     }
 
     @Override
