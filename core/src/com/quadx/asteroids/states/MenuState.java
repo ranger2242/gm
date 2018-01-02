@@ -34,7 +34,7 @@ public class MenuState extends State {
         ipField.setPosition(WIDTH*.05f,HEIGHT*.1f);
         ipField.setSize(WIDTH*.1f, HEIGHT*.05f);
         
-        stage.addActor(ipField);            // <-- Actor now on stage
+        stage.addActor(ipField);
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -130,11 +130,5 @@ public class MenuState extends State {
 
     public static void startGame(State s) {
         Game.gsm.push(s);
-    }
-    public static void inputIP(){
-        TextBox box = new TextBox();
-        Gdx.input.getTextInput(box, "ip", "", "");
-        System.out.print("hello");
-
     }
 }

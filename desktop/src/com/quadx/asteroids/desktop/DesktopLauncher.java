@@ -9,7 +9,7 @@ class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		Vector2 res=DesktopScreenAnalyzer.getScreenResolution();
-		res.scl(1.5f/2f);
+		res.scl(1f/3f);
 		config.width= (int) res.x;
 		config.height= (int) res.y;
 		config.fullscreen=false;

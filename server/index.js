@@ -31,11 +31,18 @@ io.on('connection', function (socket) {
         joinRoom(socket, name);
 
     });
+    socket.on('sendPos', function (name, pos) {
+        sendPos(name, socket.id, pos);
+
+    });
     socket.on('dropPlayer', function (room, id) {
         dropPlayer(socket, room, id);
     });
     socket.on('start', function (room) {
         startRoom(room);
+    });
+    socket.on('requestData', function (room) {
+        packageReq(socket,room);
     });
     socket.on('disconnect', function () {
         var index = players.indexOf(socket.id);
@@ -55,10 +62,19 @@ io.on('connection', function (socket) {
     });
 });
 
+function packageReq(socket, room) {
+    let s=rooms[room].getPositions();
+    socket.emit('receiveData',s);
+    slog(s,-3);
+}
+function sendPos(room, id, pos) {
+    rooms[room].updatePos(id,pos);
+}
+
 function startRoom(room) {
-    if (rooms[room]){
-        emitToList(rooms[room].getPlayers(),"start",null);
-        slog(room,5);
+    if (rooms[room]) {
+        emitToList(rooms[room].getPlayers(), "start", null);
+        slog(room, 5);
     }
 }
 
@@ -73,7 +89,7 @@ function makeRoom(socket, name) {
 
 }
 
-function dropPlayer(socket,room, id) {
+function dropPlayer(socket, room, id) {
     rooms[room].drop(id);
     slog(room + " : " + id, 4);
     emitToList(rooms[room].getPlayers(), "roomNames", rooms[room].playerListString());
@@ -83,13 +99,13 @@ function joinRoom(socket, room) {
     if (rooms[room].getCount() < 4) {
         rooms[room].addPlayer(socket.id);
         slog(socket.id + " : " + room, 3)
-        socket.emit("joinSuccess", rooms[room].getName());
+        socket.emit("joinSuccess", rooms[room].getName(),rooms[room].getPop());
         emitToList(rooms[room].getPlayers(), "roomNames", rooms[room].playerListString());
     } else
         socket.emit("joinFail");
 }
 
-function emitToList( list, event, arg) {
+function emitToList(list, event, arg) {
     for (let j = 0; j < list.length; j++) {
         io.to(list[j]).emit(event, arg);
     }

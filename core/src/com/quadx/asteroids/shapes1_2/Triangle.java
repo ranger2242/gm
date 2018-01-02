@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * V0.2
  */
 @SuppressWarnings("WeakerAccess")
-public class Triangle extends Shape{
+public class Triangle extends Shape {
     private float[] points = new float[6];
 
     public Triangle() {
@@ -21,25 +21,35 @@ public class Triangle extends Shape{
         points = p;
     }
 
-    public Triangle(Vector2 a, Vector2 b, Vector2 c){
-        this(new float[]{a.x,a.y,b.x,b.y,c.x,c.y});
+    public Triangle(Vector2 a, Vector2 b, Vector2 c) {
+        this(new float[]{a.x, a.y, b.x, b.y, c.x, c.y});
     }
-    public Triangle(Triangle t){
-        int a=t.getPoints().length;
-        float[] f= new float[a];
-        for(int i=0;i<a;i++){
-            f[i]= t.getPoints()[i];
+
+    public Triangle(Triangle t) {
+        int a = t.getPoints().length;
+        float[] f = new float[a];
+        for (int i = 0; i < a; i++) {
+            f[i] = t.getPoints()[i];
         }
-        points=f;
+        points = f;
 
     }
-    public Vector2 a(){
+
+    public Triangle(Vector2 pos, float angle, float r) {
+        points = new float[]{pos.x, pos.y,
+                (float) (pos.x + r * Math.cos(Math.toRadians(200 + angle))), (float) (pos.y + r * Math.sin(Math.toRadians(200 + angle))),
+                (float) (pos.x + r * Math.cos(Math.toRadians(160 + angle))), (float) (pos.y + r * Math.sin(Math.toRadians(160 + angle)))};
+    }
+
+    public Vector2 a() {
         return new Vector2(points[0], points[1]);
     }
-    public Vector2 b(){
+
+    public Vector2 b() {
         return new Vector2(points[2], points[3]);
     }
-    public Vector2 c(){
+
+    public Vector2 c() {
         return new Vector2(points[4], points[5]);
     }
 
@@ -51,23 +61,26 @@ public class Triangle extends Shape{
         return overlaps(Line.asLines(r));
 
     }
-    boolean overlaps(ArrayList<Line> lines){
+
+    boolean overlaps(ArrayList<Line> lines) {
         ArrayList<Line> triLines = Line.asLines(this);
         boolean ov = false;
-        for (int i=0;i<triLines.size();i++) {
-            Line l1 =triLines.get(i);
-            for (int j=0;j<lines.size();j++) {
-                Line l2 =lines.get(j);
+        for (int i = 0; i < triLines.size(); i++) {
+            Line l1 = triLines.get(i);
+            for (int j = 0; j < lines.size(); j++) {
+                Line l2 = lines.get(j);
                 ov = ov || l1.intersects(l2);
                 System.out.println("");
             }
         }
         return ov;
     }
+
     public boolean overlaps(Triangle t) {
         return overlaps(Line.asLines(t));
     }
-     public float vectorCross(Vector2 a, Vector2 b) {
+
+    public float vectorCross(Vector2 a, Vector2 b) {
         return (a.x * b.y) - (a.y * b.x);
     }
 
@@ -109,59 +122,61 @@ public class Triangle extends Shape{
         return (u >= 0) && (v >= 0) && (u + v < 1);
     }
 
-    public static Triangle create(Vector2 pos,float hight,float width){
-        return new Triangle(new float[]{pos.x,(pos.y+(hight/2)),(pos.x-(width/2)),(pos.y-(hight/2)),(pos.x+(width/2)),(pos.y-(hight/2))});
+    public static Triangle create(Vector2 pos, float hight, float width) {
+        return new Triangle(new float[]{pos.x, (pos.y + (hight / 2)), (pos.x - (width / 2)), (pos.y - (hight / 2)), (pos.x + (width / 2)), (pos.y - (hight / 2))});
     }
 
 
-    public static Triangle updatePoints(Vector2 pos, float angle,float r){
-        float[] points= new float[]{pos.x, pos.y,
-                (float) (pos.x + r * Math.cos(Math.toRadians(200+angle))), (float) (pos.y + r * Math.sin(Math.toRadians(200+angle))),
-                (float) (pos.x + r * Math.cos(Math.toRadians(160+angle))),(float) (pos.y + r * Math.sin(Math.toRadians(160+angle)))};
+    public static Triangle updatePoints(Vector2 pos, float angle, float r) {
+        float[] points = new float[]{pos.x, pos.y,
+                (float) (pos.x + r * Math.cos(Math.toRadians(200 + angle))), (float) (pos.y + r * Math.sin(Math.toRadians(200 + angle))),
+                (float) (pos.x + r * Math.cos(Math.toRadians(160 + angle))), (float) (pos.y + r * Math.sin(Math.toRadians(160 + angle)))};
         return new Triangle(points);
     }
 
-    public static ArrayList<Triangle> triangulate(Ngon o){
-        ArrayList<Triangle> output =new ArrayList<>();
-        float[] f= o.getVerticies();
-        float cx= o.getCenter().x;
-        float cy= o.getCenter().y;
-        Vector2 c= new Vector2(cx,cy);
+    public static ArrayList<Triangle> triangulate(Ngon o) {
+        ArrayList<Triangle> output = new ArrayList<>();
+        float[] f = o.getVerticies();
+        float cx = o.getCenter().x;
+        float cy = o.getCenter().y;
+        Vector2 c = new Vector2(cx, cy);
 
-        int count =0;
-        int n=o.getN();
-        for(int i=0;i<n;i++){
-            Vector2 a = new Vector2(f[count%(n*2)],f[(count+1)%(n*2)]);
-            Vector2 b = new Vector2(f[(count+2)%(n*2)],f[(count+3)%(n*2)]);
-            output.add(new Triangle(a,b,c));
-            count+=2;
+        int count = 0;
+        int n = o.getN();
+        for (int i = 0; i < n; i++) {
+            Vector2 a = new Vector2(f[count % (n * 2)], f[(count + 1) % (n * 2)]);
+            Vector2 b = new Vector2(f[(count + 2) % (n * 2)], f[(count + 3) % (n * 2)]);
+            output.add(new Triangle(a, b, c));
+            count += 2;
         }
         return output;
     }
-    public void setPos(Vector2 pos){
+
+    public void setPos(Vector2 pos) {
         Vector2 delta = new Vector2();
-        delta.x=pos.x-getCenter().x;
-        delta.y=pos.y-getCenter().y;
-        points[0]+=delta.x;
-        points[1]+=delta.y;
-        points[2]+=delta.x;
-        points[3]+=delta.y;
-        points[4]+=delta.x;
-        points[5]+=delta.y;
+        delta.x = pos.x - getCenter().x;
+        delta.y = pos.y - getCenter().y;
+        points[0] += delta.x;
+        points[1] += delta.y;
+        points[2] += delta.x;
+        points[3] += delta.y;
+        points[4] += delta.x;
+        points[5] += delta.y;
     }
-    public Vector2 getCenter(){
-        float aveX = ((a().x+ b().x+ c().x)/3);
-        float aveY =((a().y+ b().y+ c().y)/3);
-        return new Vector2(aveX,aveY);
+
+    public Vector2 getCenter() {
+        float aveX = ((a().x + b().x + c().x) / 3);
+        float aveY = ((a().y + b().y + c().y) / 3);
+        return new Vector2(aveX, aveY);
     }
 
     public void scl(Vector2 srScl) {
-        points[0]*=srScl.x;
-        points[1]*=srScl.y;
-        points[2]*=srScl.x;
-        points[3]*=srScl.y;
-        points[4]*=srScl.x;
-        points[5]*=srScl.y;
+        points[0] *= srScl.x;
+        points[1] *= srScl.y;
+        points[2] *= srScl.x;
+        points[3] *= srScl.y;
+        points[4] *= srScl.x;
+        points[5] *= srScl.y;
     }
 
 }

@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.quadx.asteroids.command.Command;
 import com.quadx.asteroids.shapes1_2.ShapeRendererExt;
 import com.quadx.asteroids.shapes1_2.Triangle;
-import com.quadx.asteroids.tools.Com;
-import com.quadx.asteroids.tools.TextBox;
+import com.quadx.asteroids.tools.Game;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import static com.quadx.asteroids.tools.Fonts.setFontSize;
@@ -22,8 +24,7 @@ public class MultiplayerState extends State {
     private ShapeRendererExt sr = new ShapeRendererExt();
     private ArrayList<String> output = new ArrayList<>();
     private static Triangle[] otherPlayers = new Triangle[0];
-    private static Com com = new Com();
-    boolean init = false;
+    boolean init;
 
     public MultiplayerState(GameStateManager gsm) {
         super(gsm);
@@ -31,11 +32,9 @@ public class MultiplayerState extends State {
     }
 
     void init() {
-        Command.cls = AsteroidState.class;
+        Command.cls = MultiplayerState.class;
         output.clear();
         sr.setAutoShapeType(true);
-        TextBox box = new TextBox();
-        Gdx.input.getTextInput(box, "ip", "", "");
         setFontSize(10);
         init=false;
         AsteroidState.startGame();
@@ -50,11 +49,27 @@ public class MultiplayerState extends State {
     public void update(float dt) {
         handleInput();
         if (AsteroidState.inGame()) {
-            Command.cls = AsteroidState.class;
             AsteroidState.updateLoop(dt);
+            sendLocation();
         }
         if(init)
             init();
+        requestData();
+    }
+
+    private void requestData() {
+        LobbyState.comm.emit("requestData",LobbyState.comm.room);
+
+    }
+    public static void setOtherPlayers(Triangle[] p){
+        otherPlayers=p;
+    }
+    DecimalFormat df= new DecimalFormat(".000");
+    private void sendLocation() {
+        Vector2 v=AsteroidState.player.getPos();
+        float a=AsteroidState.player.getAngle();
+        String s=df.format(v.x/ Game.res.x)+" "+df.format(v.y/Game.res.y)+" "+df.format((a%360)/1000);
+        LobbyState.comm.emit("sendPos",LobbyState.comm.room,s);
     }
 
     @Override
@@ -64,38 +79,24 @@ public class MultiplayerState extends State {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         if (AsteroidState.inGame()) {
-            AsteroidState.drawScene(sb, sr);
+            sr.begin(ShapeRenderer.ShapeType.Filled);
             drawOtherPlayers(sr);
+            sr.end();
+            AsteroidState.drawScene(sb, sr);
 
         }
     }
 
 
+    Color[] oc=new Color[]{Color.RED,Color.GREEN,Color.BLUE,Color.ORANGE};
     private void drawOtherPlayers(ShapeRendererExt sr) {
-        for (Triangle t : otherPlayers) {
-            sr.setColor(Color.BLUE);
+        for (int i=0;i<otherPlayers.length;i++){
+            sr.setColor(oc[i]);
+            Triangle t=otherPlayers[i];
             if (t != null && t.getPoints() != null)
                 sr.triangle(t);
         }
     }
-
-    /*    private void sbdrawStringOutput(SpriteBatch sb) {
-     *//* for(HoverText t:HoverText.texts){
-            t.draw(sb);
-        }*//*
-        for (int i = 0; i < output.size() && i < 10; i++) {
-            try {
-                Color c;
-                if (i == output.size() - 1) {
-                    c = Color.WHITE;
-                } else
-                    c = Color.GRAY;
-                Fonts.getFont().setColor(c);
-                Fonts.getFont().draw(sb, output.get(i), (2 * WIDTH / 3) - 30, HEIGHT - (i * 20) - 30);
-            } catch (IndexOutOfBoundsException | NullPointerException ignored) {
-            }
-        }
-    }*/
 
     @Override
     public void dispose() {

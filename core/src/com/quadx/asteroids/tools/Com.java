@@ -1,7 +1,11 @@
 package com.quadx.asteroids.tools;
 
+import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
+import com.quadx.asteroids.shapes1_2.Triangle;
+import com.quadx.asteroids.states.AsteroidState;
 import com.quadx.asteroids.states.LobbyState;
+import com.quadx.asteroids.states.MultiplayerState;
 import com.quadx.asteroids.states.RoomState;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -11,7 +15,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.quadx.asteroids.tools.Game.gsm;
+import static com.quadx.asteroids.tools.Game.*;
 
 /**
  * Created by Chris Cavazos on 12/10/2017.
@@ -29,7 +33,8 @@ public class Com {
     private int index = 0;
     public String serverID = "";
     private String numInLobby = "";
-    public String room="";
+    public String room = "";
+    public int color = 0;
 
     public Com() {
         gson = new Gson();
@@ -120,6 +125,25 @@ public class Com {
             }
 
         });
+        socket.on("receiveData", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                String s = args[0].toString();
+                String[] arr = s.split("~");
+                int n = arr.length;
+                Triangle[] ts = new Triangle[n];
+                float r= AsteroidState.player.getR()*sclf;
+                for (int i = 0; i < n; i++) {
+                    String[] arr2 = arr[i].split(" ");
+                    float x = Float.parseFloat(arr2[0])*res.x;
+                    float y = Float.parseFloat(arr2[1])*res.y;
+                    float a = Float.parseFloat(arr2[2])*1000;
+                    ts[i]=new Triangle(new Vector2(x,y),a,r);
+                }
+                MultiplayerState.setOtherPlayers(ts);
+            }
+
+        });
         socket.on("roomNames", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -142,7 +166,8 @@ public class Com {
         socket.on("joinSuccess", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                room=args[0].toString();
+                room = args[0].toString();
+                color= Integer.parseInt(args[1].toString());
                 RoomState state = new RoomState(gsm, room);
                 gsm.pop();
                 gsm.push(state);
@@ -218,8 +243,8 @@ public class Com {
     }
 
     public void dispose() {
-        if(!room.equals("")){
-            socket.emit("dropPlayer",room,serverID);
+        if (!room.equals("")) {
+            socket.emit("dropPlayer", room, serverID);
         }
     }
 }

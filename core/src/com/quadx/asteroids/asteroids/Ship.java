@@ -232,7 +232,7 @@ public class Ship {
     }
     public static void move(Ship s, Vector2 direction) {
         s.setAngle(direction.angle());
-        s.vel.add(direction.x * .5f, direction.y * .5f);
+        s.vel.add(direction.x * .5f*scl.x, direction.y * .5f*scl.y);
     }
     public static void swapPower(Ship player) {
         player.swap();

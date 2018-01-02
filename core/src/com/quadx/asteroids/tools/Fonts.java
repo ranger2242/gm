@@ -27,6 +27,7 @@ public class Fonts {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/font.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = (int) ((i / 1080f) * Game.res.y);
+        if(parameter.size<8)parameter.size=8;
         return generator.generateFont(parameter);
     }
     public static void setFontSize(int i) {

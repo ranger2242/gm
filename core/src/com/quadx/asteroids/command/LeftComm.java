@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.quadx.asteroids.asteroids.Ship;
 import com.quadx.asteroids.states.AsteroidState;
+import com.quadx.asteroids.states.MultiplayerState;
 
 
 public class LeftComm extends Command {
@@ -17,7 +18,7 @@ public class LeftComm extends Command {
         if(pressed()){
 
         }
-        if (cls.equals(AsteroidState.class)) {
+        if(cls.equals(AsteroidState.class)||cls.equals(MultiplayerState.class)){
             if(Gdx.input.isKeyPressed(Input.Keys.A)
                     ){
                // Ship.move(AsteroidState.player,new Vector2(-10,0));

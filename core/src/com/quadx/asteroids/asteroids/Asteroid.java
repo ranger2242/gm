@@ -6,14 +6,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.quadx.asteroids.shapes1_2.Ngon;
 import com.quadx.asteroids.shapes1_2.ShapeRendererExt;
 import com.quadx.asteroids.tools.Delta;
-import com.quadx.asteroids.tools.Game;
 
 import java.util.ArrayList;
 
 import static com.quadx.asteroids.states.AsteroidState.player;
 import static com.quadx.asteroids.states.AsteroidState.rn;
-import static com.quadx.asteroids.tools.Game.ft;
-import static com.quadx.asteroids.tools.Game.wrap;
+import static com.quadx.asteroids.tools.Game.*;
 
 public class Asteroid {
     private final Color c = new Color();
@@ -53,7 +51,7 @@ public class Asteroid {
         this.n =(int) n;
         this.angle=angle;
         this.shape = new Ngon(pos, (int)r, (int)n,angle);
-        this.shape.scl(Game.scl);
+        this.shape.scl(scl);
         this.vel.set(vel);
         this.size = (int) size;
         this.c.set((rn.nextInt(190) + 65) / 255f, (rn.nextInt(190) + 65) / 255f, (rn.nextInt(190) + 65) / 255f, 1);
@@ -171,8 +169,8 @@ public class Asteroid {
     }
 
     private void move(float dt) {
-        float x=vel.x*dt;
-        float y=vel.y*dt;
+        float x=vel.x*scl.x*dt;
+        float y=vel.y*scl.y*dt;
         pos.add(new Vector2(x,y));
         shape.setPos(pos);
     }

@@ -70,8 +70,12 @@ public class RoomState extends State {
             Fonts.getFont().draw(sb,list.get(i),(WIDTH/2)- (Fonts.getWidth(list.get(i))/2),HEIGHT*(.7f-(.05f*i)));
         }
         sb.end();
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+        try {
+            stage.act(Gdx.graphics.getDeltaTime());
+            stage.draw();
+        }catch (NullPointerException e){
+
+        }
     }
 
     @Override

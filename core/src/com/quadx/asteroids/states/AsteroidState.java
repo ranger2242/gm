@@ -170,6 +170,10 @@ public class AsteroidState extends State {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         drawScene(sb, sr);
+        sr.begin();
+        sr.setAutoShapeType(true);
+        drawPlayer(sr);
+        sr.end();
     }
 
     static void drawScene(SpriteBatch sb, ShapeRendererExt sr) {
@@ -185,7 +189,6 @@ public class AsteroidState extends State {
     }
 
     private static void srBatch(ShapeRendererExt sr) {
-        drawPlayer(sr);
         drawRocks(sr);
         drawAnims(sr);
     }
@@ -230,8 +233,8 @@ public class AsteroidState extends State {
 
     private static void checkGameOver(GameStateManager gsm) {
         if (player.isGameOver()) {
-            Sounds.gameOver.play(1f * Sounds.mainVolume);
-            gsm.pop();
+  //          Sounds.gameOver.play(1f * Sounds.mainVolume);
+//            gsm.pop();
         }
     }
 
@@ -272,7 +275,10 @@ public class AsteroidState extends State {
     private static void collisionHandler() {
         for (Asteroid a : rocks) {
             //player collision
-            collision.collide(a, player);
+            float r= a.getPos().dst(player.getPos());
+            float b= a.getR()+player.getR()+100;
+            if(r<=b)
+                collision.collide(a, player);
             //power collision
             collision.collide(a, player.getPowerUp());
 
